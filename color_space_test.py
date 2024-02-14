@@ -16,7 +16,8 @@ def read_image_from_file():
         sys.exit(1)
 
     filename = sys.argv[1]
-    return(filename)
+    
+    return filename
 
 # Save image
 def save_file(file):
@@ -80,7 +81,7 @@ def rgb_to_hsv(img):
             #Input HSV values into empty array
             arr2[row, col] = [h, s, v]
 
-    return(arr2)   
+    return arr2   
 
 # Convert RGB values to HSV values - vectorized operations
 def rgb_to_hsv_vectorized(img):
@@ -115,8 +116,8 @@ def rgb_to_hsv_vectorized(img):
     
     #Combine H,S,V values into one ndarray
     hsv_img = np.stack((hprime, s, v), axis=2)
-    #print (hsv_img)
-    return(hsv_img)   
+    
+    return hsv_img   
 
 # Convert HSV values to RGB values - vectorized operations
 def hsv_to_rgb_vectorized(img):
@@ -174,7 +175,7 @@ def hsv_to_rgb_vectorized(img):
     #Combine values to create final RGB image array
     rgb_img = np.stack((r, g, b), axis=2)
 
-    return(rgb_img)
+    return rgb_img
 
 # Modify hsv image
 def modify_hsv_image(hsv_img, hue_mod_value, sat_mod_value, val_mod_value):
@@ -192,8 +193,10 @@ def modify_hsv_image(hsv_img, hue_mod_value, sat_mod_value, val_mod_value):
     hsv_img[:, :, 1] = np.clip(hsv_img[:, :, 1] + sat_mod_value, 0, 1)
     hsv_img[:, :, 2] = np.clip(hsv_img[:, :, 2] + val_mod_value, 0, 1)   
 
+    #Convert image back to RGB
+    modified_img = hsv_to_rgb_vectorized(hsv_img)
     
-    return (hsv_img)
+    return modified_img
 
 #Read in image
 filename = read_image_from_file() 
