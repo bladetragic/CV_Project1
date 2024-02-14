@@ -178,7 +178,7 @@ def hsv_to_rgb_vectorized(img):
     return rgb_img
 
 # Modify hsv image
-def modify_hsv_image(hsv_img, hue_mod_value, sat_mod_value, val_mod_value):
+def modify_hsv_image(img, hue_mod_value, sat_mod_value, val_mod_value):
     
     # Clamp hue modification value to [0, 360]
     #hue_mod_value = max(0, min(hue_mod_value, 360))
@@ -188,6 +188,9 @@ def modify_hsv_image(hsv_img, hue_mod_value, sat_mod_value, val_mod_value):
     #     print("Saturation and value modification values should be in the range of [0, 1].")
     #     sys.exit(1)
 
+    # Convert RGB image to HSV image
+    hsv_img = rgb_to_hsv_vectorized(img)
+
     # Modify HSV values
     hsv_img[:, :, 0] = np.clip(hsv_img[:, :, 0] + hue_mod_value, 0, 360) 
     hsv_img[:, :, 1] = np.clip(hsv_img[:, :, 1] + sat_mod_value, 0, 1)
@@ -195,7 +198,16 @@ def modify_hsv_image(hsv_img, hue_mod_value, sat_mod_value, val_mod_value):
 
     #Convert image back to RGB
     modified_img = hsv_to_rgb_vectorized(hsv_img)
-    
+
+    #Display image
+    plt.imshow(modified_img)
+    plt.axis('off')
+    plt.title('Modified Image')
+    plt.show()
+
+    #Save modified image
+    save_file(modified_img)
+
     return modified_img
 
 #Read in image
@@ -211,31 +223,31 @@ val_mod_value = float(sys.argv[4])
 #Display RGB image
 plt.imshow(img)
 plt.axis('off')
-plt.title('Tree')
+plt.title('Original Image')
 plt.show()
 
 #Convert RGB image to HSV image
-img2 = rgb_to_hsv_vectorized(img)
+#img2 = rgb_to_hsv_vectorized(img)
 
 #img3 = hsv_to_rgb_vectorized(img2)
 
 #Display HSV image
-plt.imshow(img2)
-plt.axis('off')
-plt.title('Tree')
-plt.show()
+# plt.imshow(img2)
+# plt.axis('off')
+# plt.title('Tree')
+# plt.show()
 
 #Modify HSV values for HSV image
-img3 = modify_hsv_image(img2, hue_mod_value, sat_mod_value, val_mod_value)
+modified_hsv_img = modify_hsv_image(img, hue_mod_value, sat_mod_value, val_mod_value)
 
 #Display RGB image
-print(img3.shape)
-plt.imshow(img3)
-plt.axis('off')
-plt.title('Tree')
-plt.show()
+# print(img3.shape)
+# plt.imshow(img3)
+# plt.axis('off')
+# plt.title('Tree')
+# plt.show()
 
-save_file(img3)
+#save_file(img3)
 
 
 
