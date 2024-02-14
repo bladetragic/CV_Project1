@@ -1,19 +1,38 @@
+# Brandon Bowles
+# CSE 4310
+# Assignment 1
+
+import os
+import sys
 import numpy as np 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from skimage import transform
-import skimage.io as io
-import skimage.color as color
+from PIL import Image
 
-def parse_img_array(img):
-    for arr in img:
-        for pixels in arr:
-            print(pixels)
+# Read image from file
+def read_image_from_file():
+    if len(sys.argv) < 2:
+        print("No filename provided")
+        sys.exit(1)
 
-            r,g,b = pixels[0], pixels[1], pixels[2]
-            #print(r,g,b)
+    filename = sys.argv[1]
+    return(filename)
 
-#Convert RGB values to HSV values
+# Save image
+def save_file(file):
+
+    filename = input('Please enter a file name for the modified file: ')
+    
+    file_location = input('Please enter the location where you would like to save the file: ')
+    
+    #Construct full file path
+    full_file_path = os.path.join(file_location, filename)
+
+    # Convert the numpy array to PIL Image
+    img = Image.fromarray((file * 255).astype(np.uint8))
+    img.save(full_file_path)
+
+# Convert RGB values to HSV values
 def rgb_to_hsv(img):
 
     #Normalize image array
@@ -63,6 +82,7 @@ def rgb_to_hsv(img):
 
     return(arr2)   
 
+# Convert RGB values to HSV values - vectorized operations
 def rgb_to_hsv_vectorized(img):
    
     #Normalize image array
@@ -98,7 +118,7 @@ def rgb_to_hsv_vectorized(img):
     #print (hsv_img)
     return(hsv_img)   
 
-
+# Convert HSV values to RGB values - vectorized operations
 def hsv_to_rgb_vectorized(img):
 
     #Split up H, S, V channels into separate ndarrays
@@ -113,7 +133,6 @@ def hsv_to_rgb_vectorized(img):
     #Create array of ones to perform x value calculation
     ones = np.ones_like(hprime)
     x = c * (ones - abs((hprime % 2) - ones))
-    #print(x.shape)
 
     #Calculate R', G', B' values
     # R', G', B' if 0 <= H' < 1
@@ -146,28 +165,45 @@ def hsv_to_rgb_vectorized(img):
     gprime = np.where((hprime >= 5) & (hprime < 6), 0, gprime)
     bprime = np.where((hprime >= 5) & (hprime < 6), x, bprime)
     
-    # print(rprime)
-    # print(gprime)
-    # print(bprime)
-
     #Calculate m values
     m = v - c
 
     #Calculate final R, G, B values
     r, g, b = (rprime + m, gprime + m, bprime + m)
 
-    # print(r)
-    # print(g)
-    # print(b)
-
+    #Combine values to create final RGB image array
     rgb_img = np.stack((r, g, b), axis=2)
 
     return(rgb_img)
 
-#Read in image
-img = plt.imread(r"C:\Users\blade\Pictures\Image_Datasets\misc\4.1.06.tiff")
+# Modify hsv image
+def modify_hsv_image(hsv_img, hue_mod_value, sat_mod_value, val_mod_value):
+    
+    # Clamp hue modification value to [0, 360]
+    #hue_mod_value = max(0, min(hue_mod_value, 360))
 
-print(img.shape)
+    # Check if saturation and value modifications are within range
+    # if not (0 <= sat_mod_value <= 1) or not (0 <= val_mod_value <= 1):
+    #     print("Saturation and value modification values should be in the range of [0, 1].")
+    #     sys.exit(1)
+
+    # Modify HSV values
+    hsv_img[:, :, 0] = np.clip(hsv_img[:, :, 0] + hue_mod_value, 0, 360) 
+    hsv_img[:, :, 1] = np.clip(hsv_img[:, :, 1] + sat_mod_value, 0, 1)
+    hsv_img[:, :, 2] = np.clip(hsv_img[:, :, 2] + val_mod_value, 0, 1)   
+
+    
+    return (hsv_img)
+
+#Read in image
+filename = read_image_from_file() 
+print(f'File name: {filename}')
+img = plt.imread(filename)
+
+#Store hue, saturation, and value modification values from command line
+hue_mod_value = float(sys.argv[2])
+sat_mod_value = float(sys.argv[3])
+val_mod_value = float(sys.argv[4])
 
 #Display RGB image
 plt.imshow(img)
@@ -175,10 +211,10 @@ plt.axis('off')
 plt.title('Tree')
 plt.show()
 
-#img2 = rgb_to_hsv(img)
+#Convert RGB image to HSV image
 img2 = rgb_to_hsv_vectorized(img)
 
-img3 = hsv_to_rgb_vectorized(img2)
+#img3 = hsv_to_rgb_vectorized(img2)
 
 #Display HSV image
 plt.imshow(img2)
@@ -186,12 +222,17 @@ plt.axis('off')
 plt.title('Tree')
 plt.show()
 
+#Modify HSV values for HSV image
+img3 = modify_hsv_image(img2, hue_mod_value, sat_mod_value, val_mod_value)
+
 #Display RGB image
-# print(img3)
+print(img3.shape)
 plt.imshow(img3)
 plt.axis('off')
 plt.title('Tree')
 plt.show()
+
+save_file(img3)
 
 
 
