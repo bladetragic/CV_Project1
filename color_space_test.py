@@ -1,6 +1,4 @@
 # Brandon Bowles
-# CSE 4310
-# Assignment 1
 
 import os
 import sys
